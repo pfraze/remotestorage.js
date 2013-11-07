@@ -3,6 +3,7 @@
     "lib/promising.js": "A Promises/A+ implementation",
     "lib/tv4.js": "Tiny Validator for v4 JSON Schema",
     "lib/Math.uuid.js": "Universally-Unique-ID generator",
+    "lib/local.js": "An Ajax messaging library",
 
     "src/remotestorage.js": "Glue Code",
     "src/eventhandling.js": "Common event handling procedures",
@@ -32,6 +33,7 @@
       "desc": "Basic requirements to connect to a remotestorage server and send / receive data.",
       "files": [
         "lib/promising.js",
+        "lib/local.js",
         "src/remotestorage.js",
         "src/eventhandling.js",
         "src/wireclient.js",

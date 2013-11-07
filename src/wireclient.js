@@ -77,6 +77,43 @@
 
     headers['Authorization'] = 'Bearer ' + token;
 
+    console.log('dispatching', { method: method, url: uri, headers: headers, body: body })
+    local.dispatch({ method: method, url: uri, headers: headers, body: body })
+      .then(
+        function(response) {
+          console.log('!!!', response);
+          var mimeType = response.headers['content-type'];
+          var body;
+          var revision = getEtag ? response.headers['etag'] : (response.status == 200 ? fakeRevision : undefined);
+          if((! mimeType) || mimeType.match(/charset=binary/)) { // :TODO: binary not really supported by local yet
+            var blob = new Blob([response.response], {type: mimeType});
+            var reader = new FileReader();
+            reader.addEventListener("loadend", function() {
+              // reader.result contains the contents of blob as a typed array
+              promise.fulfill(response.status, reader.result, mimeType, revision);
+            });
+            reader.readAsArrayBuffer(blob);
+          } else {
+            promise.fulfill(response.status, response.body, mimeType, revision);
+          }
+        },
+        function(response) {
+          console.log('!!!', response);
+          promise.fulfill(response.status);
+        }
+      );
+
+    return promise;
+  }
+  /*function request(method, uri, token, headers, body, getEtag, fakeRevision) {
+    if((method == 'PUT' || method == 'DELETE') && uri[uri.length - 1] == '/') {
+      throw "Don't " + method + " on directories!";
+    }
+
+    var promise = promising();
+
+    headers['Authorization'] = 'Bearer ' + token;
+
     RS.WireClient.request(method, uri, {
       body: body,
       headers: headers
@@ -106,7 +143,7 @@
       }
     });
     return promise;
-  }
+  }*/
 
   function cleanPath(path) {
     // strip duplicate slashes.
